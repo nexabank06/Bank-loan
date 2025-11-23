@@ -22,7 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // FRONTEND_URL may be a single origin or a comma-separated list of allowed origins
-const FRONTEND = process.env.FRONTEND_URL || process.env.FRONTEND || 'http://localhost:8000';
+const FRONTEND = process.env.FRONTEND || 'http://localhost:8000';
 const ALLOW_NULL_ORIGIN = (process.env.ALLOW_NULL_ORIGIN === 'true') || (process.env.NODE_ENV !== 'production');
 
 // Safety checks in production
@@ -129,4 +129,5 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
