@@ -147,7 +147,7 @@
 
     // 🟩 Minimal fix: if running on GitHub Pages, use Render backend
     if (location.host.endsWith('github.io')) {
-      return 'https://nexa-bank.onrender.com';
+      return 'https://nexabank06-bank-loan.onrender.com';
     }
 
   // default: same-origin backend (when frontend served by backend)
@@ -265,3 +265,4 @@ const API_BASE = detectApiBase();
   window.initSession = initSession;
   document.addEventListener('DOMContentLoaded', ()=>{ initSession().catch(()=>{}); });
 })();
+
