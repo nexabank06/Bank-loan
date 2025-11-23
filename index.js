@@ -44,29 +44,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// Configure CORS safely: do NOT throw from the origin callback (that becomes a 500).
+// VERY SIMPLE CORS: allow any origin (good enough for your college project)
 const corsOptions = {
-  origin: (origin, cb) => {
-    // origin === undefined for same-site navigations or tools that don't set Origin
-    // origin === null for file:// contexts
-    if (typeof origin === 'undefined') return cb(null, true);
-    if (origin === null) {
-      if (ALLOW_NULL_ORIGIN) return cb(null, true);
-      // Deny but don't throw - return false so the middleware proceeds without ACAO header
-      return cb(null, false);
-    }
-
-    const allowed = FRONTEND.split(',').map(s => s.trim()).filter(Boolean);
-
-    if (allowed.includes(origin)) return cb(null, true);
-    // Deny but do not create an exception (avoid 500 on OPTIONS). Browser will block the request.
-    return cb(null, false);
-  },
-  credentials: true,
+  origin: true,        // reflects the request Origin header
+  credentials: true,   // allow cookies/authorization headers
 };
 
 app.use(cors(corsOptions));
-// Ensure preflight requests receive the same CORS handling
 app.options('*', cors(corsOptions));
 
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 200 });
@@ -126,6 +110,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
