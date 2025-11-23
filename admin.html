@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="api-base" content="https://nexa-bank.onrender.com" />
+  <title>Nexa — Admin Dashboard</title>
+  <link rel="icon" href="N.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{brand:{DEFAULT:'#7c3aed',dark:'#6d28d9'}}}}}</script>
+</head>
+<body class="min-h-screen text-slate-100">
+  <div class="min-h-screen">
+    <header class="p-4 flex items-center justify-between bg-white dark:bg-slate-900 shadow">
+      <div class="font-bold text-xl text-brand">Admin</div>
+      <button id="adminLogout" class="px-3 py-1 rounded bg-slate-800/40 text-white">Logout</button>
+    </header>
+    <main class="flex-1 p-6">
+        <section id="adminOverview" class="grid grid-cols-4 gap-4 mb-6">
+          <div class="glass p-4 rounded-xl">Total Customers<br><div id="adminTotalCustomers" class="text-2xl font-bold">—</div></div>
+          <div class="glass p-4 rounded-xl">KYC Pending<br><div id="adminKycPending" class="text-2xl font-bold">—</div></div>
+          <div class="glass p-4 rounded-xl">Active Loans<br><div id="adminActiveLoans" class="text-2xl font-bold">—</div></div>
+          <div class="glass p-4 rounded-xl">Docs to Verify<br><div id="adminDocsPending" class="text-2xl font-bold">—</div></div>
+        </section>
+        <section id="adminActivityFeed" class="glass p-4 rounded-2xl mb-6">
+          <h2 class="font-semibold mb-3">Live Activity Feed</h2>
+          <div id="adminActivityFeedList">Loading...</div>
+          <button id="adminActivityRefresh" class="mt-3 px-3 py-1 rounded bg-brand text-white">Refresh</button>
+        </section>
+        <section id="adminCustomerTable" class="glass p-4 rounded-2xl mb-6">
+          <h2 class="font-semibold mb-3">Customers</h2>
+          <div class="flex flex-wrap gap-2 mb-3">
+            <input id="adminCustomerSearch" type="text" placeholder="Search name, email, phone" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm" />
+            <select id="adminCustomerFilterKyc" aria-label="Filter by KYC status" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm">
+              <option value="">KYC: All</option>
+              <option value="pending">Pending</option>
+              <option value="verified">Verified</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <select id="adminCustomerFilterLoans" aria-label="Filter by loan status" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm">
+              <option value="">Loans: All</option>
+              <option value="active">Has active loans</option>
+              <option value="none">No active loans</option>
+            </select>
+          </div>
+          <table class="w-full text-xs">
+            <thead>
+              <tr>
+                <th>Customer Name</th>
+                <th>Email</th>
+                <th>KYC Status</th>
+                <th>Credit Score</th>
+                <th>Active Loans</th>
+                <th>Last Updated</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="adminCustomerTableBody">
+              <!-- Rows will be injected by JS -->
+            </tbody>
+          </table>
+        </section>
+        <div id="customerDetailDrawer" class="fixed top-0 right-0 h-full w-[400px] bg-white dark:bg-slate-900 shadow-xl z-50 hidden flex-col overflow-y-auto">
+          <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+            <span class="font-bold text-lg">Customer 360</span>
+            <button id="closeCustomerDrawer" class="px-2 py-1 rounded bg-slate-700 text-white">Close</button>
+          </div>
+          <div class="flex border-b border-slate-200 dark:border-slate-800">
+            <button id="tabProfile" class="flex-1 px-4 py-2 font-semibold">Profile</button>
+            <button id="tabLoans" class="flex-1 px-4 py-2">Loans</button>
+            <button id="tabKycDocs" class="flex-1 px-4 py-2">KYC & Docs</button>
+            <button id="tabBankAccounts" class="flex-1 px-4 py-2">Bank Accounts</button>
+            <button id="tabAuditLog" class="flex-1 px-4 py-2">Audit Log</button>
+          </div>
+          <div id="adminCustomerProfile" class="p-4"></div>
+          <div id="adminCustomerLoans" class="p-4 hidden"></div>
+          <div id="adminCustomerKyc" class="p-4 hidden"></div>
+          <div id="adminCustomerBankAccounts" class="p-4 hidden"></div>
+          <div id="adminCustomerAudit" class="p-4 hidden"></div>
+        </div>
+      </main>
+    </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="UI.nomodule.js"></script>
+  <script>
+    // --- Admin Dashboard Backend Wiring ---
+    async function fetchAdminOverview() {
+      try {
+        const res = await fetch('/api/admin/overview', { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to fetch overview');
+        const data = await res.json();
+        document.getElementById('adminTotalCustomers').textContent = data.total_customers || 0;
+        document.getElementById('adminKycPending').textContent = data.kyc_pending || 0;
+        document.getElementById('adminActiveLoans').textContent = data.active_loans || 0;
+        document.getElementById('adminDocsPending').textContent = data.docs_pending || 0;
+      } catch (e) { console.warn('Overview fetch failed', e); }
+    }
+
+    async function fetchAdminActivityFeed() {
+      try {
+        const res = await fetch('/api/admin/activity?limit=20', { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to fetch activity feed');
+        const { activity } = await res.json();
+        const el = document.getElementById('adminActivityFeedList');
+        if (!activity || !activity.length) { el.textContent = 'No recent activity'; return; }
+        el.innerHTML = '';
+        activity.forEach(act => {
+          const div = document.createElement('div');
+          div.className = 'mb-2 p-2 rounded bg-slate-800/40';
+          div.textContent = act.message || '';
+          el.appendChild(div);
+        });
+      } catch (e) { console.warn('Activity feed fetch failed', e); }
+    }
+
+    async function fetchAdminCustomers() {
+      try {
+        const search = document.getElementById('adminCustomerSearch').value || '';
+        const kyc = document.getElementById('adminCustomerFilterKyc').value || '';
+        const loans = document.getElementById('adminCustomerFilterLoans').value || '';
+        const url = `/api/admin/customers?search=${encodeURIComponent(search)}&kyc_status=${encodeURIComponent(kyc)}&has_active_loan=${encodeURIComponent(loans)}`;
+        const res = await fetch(url, { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to fetch customers');
+        const { customers } = await res.json();
+        const tbody = document.getElementById('adminCustomerTableBody');
+        if (!customers || !customers.length) { tbody.innerHTML = '<tr><td colspan="7" class="text-center text-slate-400">No customers found</td></tr>'; return; }
+        tbody.innerHTML = '';
+        customers.forEach(cust => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${cust.name || ''}</td>
+            <td>${cust.email || ''}</td>
+            <td><span class="px-2 py-1 rounded text-xs ${cust.kyc_status==='verified'?'bg-emerald-100 text-emerald-800':cust.kyc_status==='pending'?'bg-yellow-100 text-yellow-800':'bg-rose-100 text-rose-800'}">${cust.kyc_status || ''}</span></td>
+            <td>${cust.credit_score || '—'}</td>
+            <td>${cust.active_loans || 0}</td>
+            <td>${cust.updated_at ? cust.updated_at.substring(0,10) : '—'}</td>
+            <td><button class="px-2 py-1 rounded bg-brand text-white text-xs" onclick="openCustomerDrawer('${cust.id}')">View 360°</button></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (e) { console.warn('Customers fetch failed', e); }
+    }
+
+    // Drawer logic (stub for now)
+    function openCustomerDrawer(id) {
+      const drawer = document.getElementById('customerDetailDrawer');
+      drawer.classList.remove('hidden');
+      // TODO: Fetch and render customer details by id
+    }
+    document.getElementById('closeCustomerDrawer').onclick = function() {
+      document.getElementById('customerDetailDrawer').classList.add('hidden');
+    };
+
+    // Tab switching logic (stub)
+    document.getElementById('tabProfile').onclick = function() {
+      showDrawerTab('adminCustomerProfile');
+    };
+    document.getElementById('tabLoans').onclick = function() {
+      showDrawerTab('adminCustomerLoans');
+    };
+    document.getElementById('tabKycDocs').onclick = function() {
+      showDrawerTab('adminCustomerKyc');
+    };
+    document.getElementById('tabBankAccounts').onclick = function() {
+      showDrawerTab('adminCustomerBankAccounts');
+    };
+    document.getElementById('tabAuditLog').onclick = function() {
+      showDrawerTab('adminCustomerAudit');
+    };
+    function showDrawerTab(tabId) {
+      ['adminCustomerProfile','adminCustomerLoans','adminCustomerKyc','adminCustomerBankAccounts','adminCustomerAudit'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(tabId).classList.remove('hidden');
+    }
+
+    // Wire up search/filter controls
+    document.getElementById('adminCustomerSearch').addEventListener('input', fetchAdminCustomers);
+    document.getElementById('adminCustomerFilterKyc').addEventListener('change', fetchAdminCustomers);
+    document.getElementById('adminCustomerFilterLoans').addEventListener('change', fetchAdminCustomers);
+    document.getElementById('adminActivityRefresh').addEventListener('click', fetchAdminActivityFeed);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchAdminOverview();
+      fetchAdminActivityFeed();
+      fetchAdminCustomers();
+    });
+  </script>
+</body>
+</html>

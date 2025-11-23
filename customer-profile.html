@@ -1,0 +1,288 @@
+<!-- CUSTOMER PROFILE PAGE (2025 SUBMISSION) -->
+<!--
+Blueprint: View/edit personal details, KYC status, upload/view/replace docs, manage bank accounts, quick stats, audit log.
+-->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="api-base" content="https://nexa-bank.onrender.com" />
+  <title>Nexa — Customer Profile</title>
+  <link rel="icon" href="N.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{brand:{DEFAULT:'#7c3aed',dark:'#6d28d9'}}}}}</script>
+</head>
+<body class="min-h-screen text-slate-900 bg-white dark:bg-slate-900">
+  <div class="flex min-h-screen">
+    <aside class="w-64 bg-slate-900 min-h-screen p-4 flex flex-col gap-6">
+      <a href="index.html" class="flex items-center gap-2 mb-6"><img src="Nexa Bank.png" class="site-logo" alt="logo"/></a>
+      <nav class="space-y-2 text-sm">
+        <a href="customer-dashboard.html" class="block px-3 py-2 rounded hover:bg-slate-800">Dashboard</a>
+        <a href="customer-profile.html" class="block px-3 py-2 rounded hover:bg-slate-800 font-semibold">Profile</a>
+        <button id="customerLogout" class="w-full mt-6 px-3 py-2 rounded bg-slate-800/40 text-white">Logout</button>
+      </nav>
+    </aside>
+    <div class="flex-1 flex flex-col min-h-screen">
+      <header class="p-4 flex items-center justify-between bg-white dark:bg-slate-900 shadow">
+        <div class="font-bold text-lg text-brand pl-4">Welcome back, <span id="customerName">Customer</span>!</div>
+      </header>
+    <main class="flex-1 p-6 container-max mx-auto">
+      <div class="mb-4">
+        <a href="customer-dashboard.html" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/50 hover:bg-slate-700/50 border border-white/10 transition font-semibold">← Back to Dashboard</a>
+      </div>
+      <!-- Header Card -->
+      <div class="glass p-4 rounded-xl mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <div class="text-xl font-bold" id="profileName">Aayush Panchal</div>
+          <div class="text-sm text-slate-500" id="profileEmail">user@example.com</div>
+        </div>
+        <div class="flex items-center gap-3">
+          <span id="kycStatus" class="px-3 py-1 rounded bg-yellow-100 text-yellow-800 text-xs">KYC Pending</span>
+          <button id="editProfileBtn" class="px-3 py-1 rounded bg-brand text-white">Edit Profile</button>
+        </div>
+      </div>
+      <!-- Main Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <!-- Left: Personal Details Form -->
+        <section class="glass p-4 rounded-2xl">
+          <h2 class="font-semibold mb-3">Personal Details</h2>
+          <form id="profileForm" class="space-y-3">
+              <div><label for="fullName">Full Name</label><input type="text" id="fullName" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div><label for="dob">Date of Birth</label><input type="date" id="dob" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div><label for="gender">Gender</label><select id="gender" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled><option>male</option><option>female</option><option>other</option></select></div>
+              <div><label for="email">Email</label><input type="email" id="email" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div><label for="phone">Phone</label><input type="tel" id="phone" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div><label for="addressLine1">Address</label><input type="text" id="addressLine1" placeholder="Line 1" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div class="flex gap-2"><label for="city" class="sr-only">City</label><input type="text" id="city" placeholder="City" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /><label for="state" class="sr-only">State</label><input type="text" id="state" placeholder="State" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div class="flex gap-2"><label for="postalCode" class="sr-only">Postal Code</label><input type="text" id="postalCode" placeholder="Postal Code" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /><label for="country" class="sr-only">Country</label><input type="text" id="country" placeholder="Country" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div><label for="employmentType">Employment Type</label><input type="text" id="employmentType" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div><label for="employerName">Employer</label><input type="text" id="employerName" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+              <div><label for="monthlyIncome">Monthly Income</label><input type="number" id="monthlyIncome" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" disabled /></div>
+          </form>
+        </section>
+        <!-- Right: KYC & Documents -->
+        <section class="glass p-4 rounded-2xl">
+          <h2 class="font-semibold mb-3">KYC & Documents</h2>
+          <div id="kycChecklist" class="mb-3"></div>
+          <div id="docUploads"></div>
+          <h3 class="font-semibold mt-4 mb-2">Bank Accounts & UPI</h3>
+          <div id="bankAccounts"></div>
+          <button id="addBankBtn" class="mt-2 px-3 py-1 rounded bg-brand text-white">Add Bank Account</button>
+          <!-- Add Bank Account Modal -->
+          <div id="addBankModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40">
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl w-full max-w-md mx-auto">
+              <h3 class="font-semibold mb-3">Add Bank Account</h3>
+              <form id="addBankForm" class="space-y-3">
+                  <div><label for="bankHolder">Account Holder</label><input type="text" id="bankHolder" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" required placeholder="Account holder name" title="Account holder name" /></div>
+                  <div><label for="bankNumber">Account Number</label><input type="text" id="bankNumber" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" required placeholder="Account number" title="Account number" /></div>
+                  <div><label for="bankIfsc">IFSC</label><input type="text" id="bankIfsc" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" required placeholder="IFSC code" title="IFSC code" /></div>
+                  <div><label for="bankName">Bank Name</label><input type="text" id="bankName" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" required placeholder="Bank name" title="Bank name" /></div>
+                  <div><label for="bankType">Type</label><select id="bankType" class="w-full px-3 py-2 rounded bg-slate-100 dark:bg-slate-800" title="Account type"><option>savings</option><option>current</option></select></div>
+                <div class="flex gap-2 justify-end"><button type="button" id="cancelBankBtn" class="px-3 py-1 rounded bg-slate-700 text-white">Cancel</button><button type="submit" class="px-3 py-1 rounded bg-brand text-white">Add</button></div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
+      <!-- Quick Stats & Audit Log -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="glass p-4 rounded-2xl">Credit Score<br><div id="creditScore" class="text-2xl font-bold">—</div></div>
+        <div class="glass p-4 rounded-2xl">Active Loans<br><div id="activeLoans" class="text-2xl font-bold">—</div></div>
+        <div class="glass p-4 rounded-2xl">Next EMI<br><div id="nextEmi" class="text-2xl font-bold">—</div></div>
+      </div>
+      <section class="glass p-4 rounded-2xl mb-8">
+        <h2 class="font-semibold mb-3">Profile Update History</h2>
+        <div id="auditLog">No updates yet</div>
+        <div class="text-xs text-slate-400 mt-2">Last updated: <span id="lastUpdated">—</span></div>
+      </section>
+      <!-- Floating Save/Cancel CTA -->
+      <div id="profileCta" class="fixed bottom-4 left-0 w-full flex justify-center z-50 hidden">
+        <div class="glass rounded-xl p-3 flex gap-4 shadow-soft">
+          <button id="saveProfileBtn" class="px-4 py-2 rounded bg-emerald-600 text-white font-semibold">Save Changes</button>
+          <button id="cancelProfileBtn" class="px-4 py-2 rounded bg-slate-700 text-white">Cancel</button>
+        </div>
+      </div>
+    </main>
+    <footer class="p-4 text-center text-xs text-slate-400">Nexa Bank &copy; 2025</footer>
+  </div>
+  <script src="UI.nomodule.js"></script>
+  <script>
+    // Demo/mock profile data
+    const demoProfile = {
+      full_name: "Aayush Panchal",
+      email: "user@example.com",
+      dob: "1999-06-12",
+      gender: "male",
+      phone: "+91-9876543210",
+      address: { line1: "123 Main St", city: "Mumbai", state: "MH", postal_code: "400001", country: "India" },
+      employment: { employment_type: "salaried", employer_name: "ACME", monthly_income: 50000 },
+      kyc_status: "pending",
+      credit_score: 720,
+      documents: [
+        { id: "doc1", type: "aadhaar", file_name: "aadhaar.pdf", status: "verified", uploaded_at: "2025-11-10" },
+        { id: "doc2", type: "pan", file_name: "pan.pdf", status: "pending", uploaded_at: "2025-11-12" }
+      ],
+      bank_accounts: [
+        { id: "bank1", bank_name: "HDFC", account_holder: "Aayush", account_mask: "XXXXXX1234", is_autopay_enabled: true }
+      ],
+      active_loans: 2,
+      next_emi: "₹5,400 on 5 Dec",
+      audit_log: [
+        { action: "Profile updated", by: "user", time: "2025-11-18 14:22" },
+        { action: "Aadhaar uploaded", by: "user", time: "2025-11-10 09:10" }
+      ],
+      updated_at: "2025-11-18 14:22"
+    };
+
+    let editing = false;
+    let draftProfile = null;
+    function setEditing(state) {
+      editing = state;
+      document.getElementById('profileCta').style.display = state ? 'flex' : 'none';
+      // Enable/disable all form fields
+      document.querySelectorAll('#profileForm input, #profileForm select').forEach(el => {
+        el.disabled = !state;
+      });
+    }
+
+    function loadProfile(profile) {
+      document.getElementById('profileName').textContent = profile.full_name;
+      document.getElementById('profileEmail').textContent = profile.email;
+      document.getElementById('kycStatus').textContent = profile.kyc_status.charAt(0).toUpperCase() + profile.kyc_status.slice(1);
+      document.getElementById('kycStatus').className = 'px-3 py-1 rounded text-xs ' +
+        (profile.kyc_status === 'verified' ? 'bg-emerald-100 text-emerald-800' : profile.kyc_status === 'rejected' ? 'bg-rose-100 text-rose-800' : 'bg-yellow-100 text-yellow-800');
+      // Personal details
+      document.getElementById('fullName').value = profile.full_name;
+      document.getElementById('dob').value = profile.dob;
+      document.getElementById('gender').value = profile.gender;
+      document.getElementById('email').value = profile.email;
+      document.getElementById('phone').value = profile.phone;
+      document.getElementById('addressLine1').value = profile.address.line1;
+      document.getElementById('city').value = profile.address.city;
+      document.getElementById('state').value = profile.address.state;
+      document.getElementById('postalCode').value = profile.address.postal_code;
+      document.getElementById('country').value = profile.address.country;
+      document.getElementById('employmentType').value = profile.employment.employment_type;
+      document.getElementById('employerName').value = profile.employment.employer_name;
+      document.getElementById('monthlyIncome').value = profile.employment.monthly_income;
+      setEditing(false);
+      draftProfile = JSON.parse(JSON.stringify(profile));
+      // KYC checklist
+      document.getElementById('kycChecklist').innerHTML = [
+        'Aadhaar', 'PAN', 'Income Proof', 'Bank Statement'
+      ].map(type => {
+        const doc = profile.documents.find(d => d.type === type.toLowerCase().replace(' ', '_'));
+        return `<div class='flex items-center gap-2 mb-1'><span>${type}</span><span class='text-xs rounded px-2 py-0.5 ${doc ? (doc.status === 'verified' ? 'bg-emerald-100 text-emerald-800' : doc.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-rose-100 text-rose-800') : 'bg-slate-100 text-slate-500'}'>${doc ? doc.status : 'missing'}</span></div>`;
+      }).join('');
+      // Document uploads
+      document.getElementById('docUploads').innerHTML = profile.documents.map(doc =>
+        `<div class='mb-2 p-2 rounded bg-slate-100 dark:bg-slate-800 flex justify-between items-center'>
+          <span>${doc.type.toUpperCase()} <span class='text-xs text-slate-500'>${doc.file_name}</span></span>
+          <span class='text-xs'>${doc.status}</span>
+          <label class='px-2 py-1 rounded bg-slate-200 dark:bg-slate-700 text-xs cursor-pointer'>Replace<input type='file' data-docid='${doc.id}' data-type='${doc.type}' class='hidden doc-upload-input' /></label>
+        </div>`
+      ).join('') +
+      `<div class='mt-3'><label class='px-2 py-1 rounded bg-brand text-white text-xs cursor-pointer'>Upload New Document<input type='file' id='newDocUpload' class='hidden' /></label></div>`;
+      // Bank accounts
+      document.getElementById('bankAccounts').innerHTML = profile.bank_accounts.map(acc =>
+        `<div class='mb-2 p-2 rounded bg-slate-100 dark:bg-slate-800 flex justify-between items-center'>
+          <span>${acc.bank_name} <span class='text-xs text-slate-500'>${acc.account_mask}</span></span>
+          <span class='text-xs'>${acc.is_autopay_enabled ? 'Auto-pay ON' : ''}</span>
+        </div>`
+      ).join('');
+      // Quick stats
+      document.getElementById('creditScore').textContent = profile.credit_score;
+      document.getElementById('activeLoans').textContent = profile.active_loans;
+      document.getElementById('nextEmi').textContent = profile.next_emi;
+      // Audit log
+      document.getElementById('auditLog').innerHTML = profile.audit_log.map(log =>
+        `<div class='mb-1 p-2 rounded bg-slate-100 dark:bg-slate-800 flex justify-between'><span>${log.action}</span><span class='text-xs text-slate-500'>${log.time}</span></div>`
+      ).join('');
+      document.getElementById('lastUpdated').textContent = profile.updated_at;
+    }
+
+    document.getElementById('editProfileBtn').addEventListener('click', () => {
+      setEditing(true);
+    });
+    document.getElementById('cancelProfileBtn').addEventListener('click', () => {
+      loadProfile(draftProfile);
+      setEditing(false);
+    });
+    document.getElementById('saveProfileBtn').addEventListener('click', () => {
+      // Here you would send updated data to backend (PUT /api/customer/me)
+      // For demo, just disable editing and update draft
+      draftProfile.full_name = document.getElementById('fullName').value;
+      draftProfile.dob = document.getElementById('dob').value;
+      draftProfile.gender = document.getElementById('gender').value;
+      draftProfile.email = document.getElementById('email').value;
+      draftProfile.phone = document.getElementById('phone').value;
+      draftProfile.address.line1 = document.getElementById('addressLine1').value;
+      draftProfile.address.city = document.getElementById('city').value;
+      draftProfile.address.state = document.getElementById('state').value;
+      draftProfile.address.postal_code = document.getElementById('postalCode').value;
+      draftProfile.address.country = document.getElementById('country').value;
+      draftProfile.employment.employment_type = document.getElementById('employmentType').value;
+      draftProfile.employment.employer_name = document.getElementById('employerName').value;
+      draftProfile.employment.monthly_income = document.getElementById('monthlyIncome').value;
+      setEditing(false);
+      loadProfile(draftProfile);
+    });
+    function handleDocUpload(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      // For demo, just show alert. In real app, POST to /api/customer/documents
+      alert('Uploading: ' + file.name);
+      // After upload, reload profile (simulate)
+      setTimeout(() => loadProfile(demoProfile), 1000);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      // Try to load user info from localStorage (from registration)
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem('nexaUser'));
+      } catch {}
+      if (user && user.name && user.email && user.dob) {
+        // Fill profile with registered info
+        const profile = Object.assign({}, demoProfile, {
+          full_name: user.name,
+          email: user.email,
+          dob: user.dob
+        });
+        loadProfile(profile);
+      } else {
+        loadProfile(demoProfile);
+      }
+      // Wire up upload handlers
+      document.getElementById('docUploads').addEventListener('change', function(e) {
+        if (e.target.classList.contains('doc-upload-input') || e.target.id === 'newDocUpload') {
+          handleDocUpload(e);
+        }
+      });
+      // Add bank account modal logic
+      const addBankBtn = document.getElementById('addBankBtn');
+      const addBankModal = document.getElementById('addBankModal');
+      const cancelBankBtn = document.getElementById('cancelBankBtn');
+      const addBankForm = document.getElementById('addBankForm');
+      addBankBtn.addEventListener('click', () => {
+        addBankModal.classList.remove('hidden');
+        addBankModal.classList.add('flex');
+      });
+      cancelBankBtn.addEventListener('click', () => {
+        addBankModal.classList.add('hidden');
+        addBankModal.classList.remove('flex');
+      });
+      addBankForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        // For demo, just show alert. In real app, POST to /api/customer/bank_accounts
+        alert('Bank account added!');
+        addBankModal.classList.add('hidden');
+        addBankModal.classList.remove('flex');
+        // After add, reload profile (simulate)
+        setTimeout(() => loadProfile(demoProfile), 1000);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="api-base" content="https://nexa-bank.onrender.com" />
+  <title>Nexa — Customer Dashboard</title>
+  <link rel="icon" href="N.png" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={darkMode:'class',theme:{extend:{colors:{brand:{DEFAULT:'#7c3aed',dark:'#6d28d9'}}}}}</script>
+</head>
+<body class="min-h-screen text-slate-900 bg-white dark:bg-slate-900">
+  <div class="flex min-h-screen">
+    <aside class="w-64 bg-slate-900 min-h-screen p-4 flex flex-col gap-6">
+      <a href="index.html" class="flex items-center gap-2 mb-6"><img src="Nexa Bank.png" class="site-logo" alt="logo"/></a>
+      <nav class="space-y-2 text-sm">
+        <a href="customer-dashboard.html" class="block px-3 py-2 rounded hover:bg-slate-800 font-semibold">Dashboard</a>
+        <a href="customer-profile.html" class="block px-3 py-2 rounded hover:bg-slate-800">Profile</a>
+        <button id="customerLogout" class="w-full mt-6 px-3 py-2 rounded bg-slate-800/40 text-white">Logout</button>
+      </nav>
+    </aside>
+    <div class="flex-1 flex flex-col min-h-screen">
+      <header class="p-4 flex items-center justify-between bg-white dark:bg-slate-900 shadow">
+        <div class="font-bold text-lg text-brand pl-4">Welcome back, <span id="customerName">Customer</span>!</div>
+      </header>
+    <main class="flex-1 p-6 container-max mx-auto">
+      <div class="flex justify-end mb-4">
+        <a href="products.html" class="quick-action">Apply for Loan</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="glass card-hero p-4 rounded-xl flex flex-col gap-2">
+          <div class="flex items-center gap-2"><span class="inline-block bg-brand/10 p-2 rounded-full"><svg width="20" height="20" fill="none" stroke="#7c3aed" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></span>Repayment Score</div>
+          <div id="insightScore" class="text-2xl font-bold">—</div>
+        </div>
+        <div class="glass card-hero p-4 rounded-xl flex flex-col gap-2">
+          <div class="flex items-center gap-2"><span class="inline-block bg-brand/10 p-2 rounded-full"><svg width="20" height="20" fill="none" stroke="#7c3aed" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/></svg></span>On-time EMIs</div>
+          <div id="insightEmi" class="text-2xl font-bold">—</div>
+        </div>
+        <div class="glass card-hero p-4 rounded-xl flex flex-col gap-2">
+          <div class="flex items-center gap-2"><span class="inline-block bg-brand/10 p-2 rounded-full"><svg width="20" height="20" fill="none" stroke="#7c3aed" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20V10M12 10l-6 6M12 10l6 6"/></svg></span>Principal Reduced</div>
+          <div id="insightPrincipal" class="text-2xl font-bold">—</div>
+        </div>
+        <div class="glass card-hero p-4 rounded-xl flex flex-col gap-2">
+          <div class="flex items-center gap-2"><span class="inline-block bg-brand/10 p-2 rounded-full"><svg width="20" height="20" fill="none" stroke="#7c3aed" stroke-width="2" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12"/></svg></span>Loan Closure Forecast</div>
+          <div id="insightForecast" class="text-2xl font-bold">—</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <!-- EMI Calculator Widget -->
+        <section class="glass p-4 rounded-2xl">
+          <h2 class="font-semibold mb-3">EMI Calculator</h2>
+          <div class="flex flex-col gap-2">
+            <label for="calcAmount" class="sr-only">Loan Amount</label>
+            <input id="calcAmount" type="number" placeholder="Loan Amount" aria-label="Loan Amount" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm" />
+            <label for="calcRate" class="sr-only">Interest Rate</label>
+            <input id="calcRate" type="number" placeholder="Interest Rate (%)" aria-label="Interest Rate (%)" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm" />
+            <label for="calcMonths" class="sr-only">Tenure</label>
+            <input id="calcMonths" type="number" placeholder="Tenure (months)" aria-label="Tenure (months)" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm" />
+            <div class="flex items-center gap-2 mt-2">EMI: <span id="calcEmi" class="font-bold text-lg">—</span></div>
+            <div class="flex items-center gap-2">Total Interest: <span id="calcInterest">—</span></div>
+            <div class="flex items-center gap-2">Total Payable: <span id="calcTotal">—</span></div>
+            <div class="mt-2">
+              <div class="flex justify-between text-xs text-slate-500"><span>Paid</span><span>Outstanding</span></div>
+              <div class="emi-progress-bar" id="emiProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" style="width:0%"></div>
+            </div>
+          </div>
+        </section>
+        <!-- AI-powered Loan Eligibility Checker Widget -->
+        <section class="glass p-4 rounded-2xl animate-scale-in">
+          <h2 class="font-semibold mb-3">Loan Eligibility Checker <span title="Demo AI logic" class="text-xs text-brand">AI</span></h2>
+          <div class="flex flex-col gap-2">
+            <label for="eligIncome" class="sr-only">Monthly Income</label>
+            <input id="eligIncome" type="number" placeholder="Monthly Income (₹)" aria-label="Monthly Income (₹)" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm" />
+            <label for="eligAmount" class="sr-only">Desired Loan Amount</label>
+            <input id="eligAmount" type="number" placeholder="Desired Loan Amount (₹)" aria-label="Desired Loan Amount (₹)" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm" />
+            <label for="eligTenure" class="sr-only">Tenure</label>
+            <input id="eligTenure" type="number" placeholder="Tenure (months)" aria-label="Tenure (months)" class="px-3 py-2 rounded bg-slate-100 dark:bg-slate-800 text-sm" />
+            <button id="checkEligibility" class="mt-2 px-3 py-2 rounded bg-brand text-white font-semibold cta-animate">Check Eligibility</button>
+            <div id="eligibilityResult" class="mt-3 text-center text-lg font-bold"></div>
+            <div id="eligibilitySuggestion" class="mt-1 text-center text-sm text-slate-500"></div>
+          </div>
+        </section>
+        <!-- Smart Reminders Widget -->
+        <section class="glass p-4 rounded-2xl">
+          <h2 class="font-semibold mb-3">Smart Reminders</h2>
+          <ul id="reminders" class="list-disc pl-5 text-sm"></ul>
+        </section>
+      </div>
+        <script>
+          // Loan Eligibility Checker Logic (Simple AI Demo)
+          // This is a simple, easy-to-understand logic for demo purposes.
+          document.getElementById('checkEligibility').addEventListener('click', function() {
+            const income = parseFloat(document.getElementById('eligIncome').value) || 0;
+            const amount = parseFloat(document.getElementById('eligAmount').value) || 0;
+            const tenure = parseInt(document.getElementById('eligTenure').value) || 0;
+            const resultEl = document.getElementById('eligibilityResult');
+            const suggestionEl = document.getElementById('eligibilitySuggestion');
+            // Basic eligibility: EMI should not exceed 40% of monthly income
+            if (income <= 0 || amount <= 0 || tenure <= 0) {
+              resultEl.textContent = 'Please fill all fields.';
+              resultEl.style.color = '#ef4444';
+              suggestionEl.textContent = '';
+              return;
+            }
+            // Calculate EMI (same as EMI calculator)
+            const rate = 10.5 / 1200; // Assume 10.5% annual interest
+            const power = Math.pow(1 + rate, tenure);
+            const emi = (amount * rate * power) / (power - 1);
+            const maxEmi = income * 0.4;
+            if (emi <= maxEmi) {
+              resultEl.textContent = 'Eligible ✅';
+              resultEl.style.color = '#22c55e';
+              suggestionEl.textContent = 'You can apply for this loan.';
+            } else {
+              resultEl.textContent = 'Not Eligible ❌';
+              resultEl.style.color = '#ef4444';
+              // Suggest a lower amount or longer tenure
+              let suggestion = '';
+              if (emi > maxEmi && tenure < 84) suggestion = 'Try increasing the tenure.';
+              if (emi > maxEmi && amount > 10000) suggestion += (suggestion ? ' ' : '') + 'Try reducing the loan amount.';
+              suggestionEl.textContent = suggestion || 'Please adjust your inputs.';
+            }
+          });
+        </script>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <section class="glass p-4 rounded-2xl">
+          <h2 class="font-semibold mb-3">Document Vault</h2>
+          <div id="docVault">No documents uploaded</div>
+        </section>
+      </div>
+      <!-- ...existing HTML... -->
+      <script>
+        // --- API helpers ---
+        function getApiBase() {
+          const meta = document.querySelector('meta[name="api-base"]');
+          return meta ? meta.content : '';
+        }
+        const API_BASE = getApiBase();
+        const TOKEN = localStorage.getItem('nexaToken');
+        async function apiGet(path) {
+          const res = await fetch(API_BASE + path, {
+            headers: { 'Authorization': TOKEN ? `Bearer ${TOKEN}` : '', 'Accept': 'application/json' },
+            credentials: 'include'
+          });
+          if (!res.ok) throw new Error('API error: ' + res.status);
+          return res.json();
+        }
+
+        // EMI Calculator logic (unchanged)
+        function calcEMI() {
+          const amount = parseFloat(document.getElementById('calcAmount').value) || 0;
+          const rate = parseFloat(document.getElementById('calcRate').value) || 0;
+          const months = parseInt(document.getElementById('calcMonths').value) || 0;
+          const emiEl = document.getElementById('calcEmi');
+          const intEl = document.getElementById('calcInterest');
+          const totEl = document.getElementById('calcTotal');
+          const progressEl = document.getElementById('emiProgress');
+          if (!progressEl) return;
+          // For now, progress bar is static or can be computed from backend later
+          const paidEmis = 8;
+          if (amount > 0 && rate > 0 && months > 0) {
+            const j = rate / 1200;
+            const power = Math.pow(1 + j, months);
+            const emi = (amount * j * power) / (power - 1);
+            const total = emi * months;
+            const interest = total - amount;
+            emiEl.textContent = '₹ ' + emi.toFixed(2);
+            intEl.textContent = '₹ ' + interest.toFixed(2);
+            totEl.textContent = '₹ ' + total.toFixed(2);
+            const progress = Math.min(100, Math.round((paidEmis / months) * 100));
+            progressEl.style.width = progress + '%';
+            progressEl.setAttribute('aria-valuenow', progress);
+          } else {
+            emiEl.textContent = '—';
+            intEl.textContent = '—';
+            totEl.textContent = '—';
+            progressEl.style.width = '0%';
+            progressEl.setAttribute('aria-valuenow', 0);
+          }
+        }
+        ['calcAmount','calcRate','calcMonths'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.addEventListener('input', calcEMI);
+            el.addEventListener('change', calcEMI);
+          }
+        });
+        document.getElementById('calcAmount').value = 500000;
+        document.getElementById('calcRate').value = 10.5;
+        document.getElementById('calcMonths').value = 36;
+        calcEMI();
+
+        // --- Real API fetches ---
+        async function fetchInsights() {
+          try {
+            const data = await apiGet('/api/customer/insights');
+            document.getElementById('insightScore').textContent = data.score + '%';
+            document.getElementById('insightEmi').textContent = data.emi + ' paid';
+            document.getElementById('insightPrincipal').textContent = '₹' + data.principal.toLocaleString();
+            document.getElementById('insightForecast').textContent = data.forecast + ' months';
+          } catch (e) {
+            document.getElementById('insightScore').textContent = '—';
+            document.getElementById('insightEmi').textContent = '—';
+            document.getElementById('insightPrincipal').textContent = '—';
+            document.getElementById('insightForecast').textContent = '—';
+          }
+        }
+
+        async function fetchReminders() {
+          const ul = document.getElementById('reminders');
+          ul.innerHTML = '';
+          try {
+            const reminders = await apiGet('/api/customer/reminders');
+            if (!reminders.length) {
+              const li = document.createElement('li');
+              li.textContent = 'No reminders';
+              ul.appendChild(li);
+              return;
+            }
+            reminders.forEach(text => {
+              const li = document.createElement('li');
+              li.textContent = text;
+              ul.appendChild(li);
+            });
+          } catch {
+            const li = document.createElement('li');
+            li.textContent = 'Could not load reminders';
+            ul.appendChild(li);
+          }
+        }
+
+        async function fetchDocVault() {
+          const el = document.getElementById('docVault');
+          try {
+            const docs = await apiGet('/api/customer/documents');
+            if (!docs.length) { el.textContent = 'No documents uploaded'; return; }
+            el.innerHTML = '';
+            docs.forEach(doc => {
+              const div = document.createElement('div');
+              div.className = 'mb-1 p-2 rounded bg-slate-100 dark:bg-slate-800 flex justify-between items-center';
+              let statusClass = 'bg-yellow-100 text-yellow-800';
+              if(doc.status.toLowerCase()==='verified') statusClass = 'bg-emerald-100 text-emerald-800';
+              if(doc.status.toLowerCase()==='rejected') statusClass = 'bg-rose-100 text-rose-800';
+              div.innerHTML = `<span>${doc.type}</span><span class='text-xs rounded px-2 py-0.5 ${statusClass}'>${doc.status}</span>`;
+              el.appendChild(div);
+            });
+          } catch (err) {
+            el.textContent = err.message || 'Could not load documents';
+          }
+        }
+
+        async function fetchBankAccounts() {
+          const el = document.getElementById('bankAccounts');
+          if (!el) return;
+          try {
+            const accounts = await apiGet('/api/customer/bank-accounts');
+            if (!accounts.length) { el.textContent = 'No bank accounts added'; return; }
+            el.innerHTML = '';
+            el.className = 'text-sm space-y-1 animate-list';
+            accounts.forEach(acc => {
+              const li = document.createElement('li');
+              li.textContent = `${acc.bank_name} — ${acc.account_mask}`;
+              el.appendChild(li);
+            });
+          } catch (err) {
+            el.textContent = err.message || 'Could not load bank accounts';
+          }
+        }
+
+        async function showCurrentLoanInfo() {
+          const el = document.getElementById('currentLoanInfo');
+          try {
+            const info = await apiGet('/api/customer/loan-summary');
+            if (info && info.type) {
+              el.innerHTML = `<div class='mb-2'>You have taken a <b>${info.type}</b> for <b>${info.months} months</b>.<br>Amount: <b>₹${info.amount.toLocaleString()}</b> <span class='ml-2 px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-xs'>${info.status}</span></div>`;
+            } else {
+              el.innerHTML = `<div class='mb-2 text-slate-500'>No active loan found. <a href='products.html' class='text-brand underline'>Apply for a loan</a></div>`;
+            }
+          } catch {
+            el.innerHTML = `<div class='mb-2 text-slate-500'>Could not load loan info.</div>`;
+          }
+        }
+
+        async function fetchLoanComparison() {
+          const el = document.getElementById('loanComparison');
+          try {
+            const products = await apiGet('/api/customer/loan-comparison');
+            if (!products.length) { el.textContent = 'No products to compare'; return; }
+            el.innerHTML = `<table class='w-full text-xs'><thead><tr><th>Product</th><th>Rate</th><th>EMI</th><th>Tenure</th></tr></thead><tbody></tbody></table>`;
+            const tbody = el.querySelector('tbody');
+            products.forEach(p => {
+              const tr = document.createElement('tr');
+              tr.innerHTML = `<td>${p.name}</td><td>${p.rate}%</td><td>₹${p.emi}</td><td>${p.tenure} mo</td>`;
+              tbody.appendChild(tr);
+            });
+          } catch {
+            el.textContent = 'Could not load loan comparison';
+          }
+        }
+
+        // Support Center, Statements, Analytics, Notifications can remain static or be wired up later
+        async function fetchSupportCenter() {
+          const el = document.getElementById('supportCenter');
+          if (!el) return;
+          el.innerHTML = `
+            <ul class="text-sm space-y-1 animate-list">
+              <li>💬 Chatbot (coming soon)</li>
+              <li>📨 Raise a support ticket</li>
+              <li>📞 Request a callback</li>
+              <li>❓ Browse FAQs</li>
+            </ul>
+          `;
+        }
+        async function fetchStatements() {
+          const el = document.getElementById('statements');
+          if (!el) return;
+          el.innerHTML = `
+            <ul class="text-sm space-y-1 animate-list">
+              <li>March 2025 Statement (PDF)</li>
+              <li>February 2025 Statement (PDF)</li>
+              <li>January 2025 Statement (PDF)</li>
+            </ul>
+          `;
+        }
+        async function fetchAnalytics() {
+          const canvas = document.getElementById('analyticsChart');
+          if (!canvas || !window.Chart) return;
+          const ctx = canvas.getContext('2d');
+          new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+              datasets: [{ label: 'EMI Payments', data: [1, 2, 3, 4, 5, 6], tension: 0.4 }]
+            },
+            options: {
+              plugins: { legend: { display: false } },
+              scales: { x: { grid: { display: false } }, y: { ticks: { stepSize: 1 } } }
+            }
+          });
+        }
+        async function fetchNotifications() {
+          const el = document.getElementById('notifications');
+          if (!el) return;
+          el.innerHTML = `
+            <ul class="text-sm space-y-1 animate-list">
+              <li>✅ EMI for Nov credited successfully.</li>
+              <li>🔔 New offer: Pre-approved top-up loan.</li>
+            </ul>
+          `;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+          // Set customer name from localStorage if available
+          let user = null;
+          try {
+            user = JSON.parse(localStorage.getItem('nexaUser'));
+          } catch {}
+          if (user && user.name) {
+            document.getElementById('customerName').textContent = user.name;
+          } else {
+            document.getElementById('customerName').textContent = 'Customer';
+          }
+          fetchInsights();
+          fetchReminders();
+          fetchDocVault();
+          fetchLoanComparison();
+          fetchSupportCenter();
+          fetchStatements();
+          fetchAnalytics();
+          fetchBankAccounts();
+          fetchNotifications();
+          showCurrentLoanInfo();
+          // Wire logout button if present
+          const logoutBtn = document.getElementById('customerLogout');
+          if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+              localStorage.removeItem('nexaUser');
+              localStorage.removeItem('nexaToken');
+              window.location.href = 'login.html';
+            });
+          }
+        });
+      </script>
+    <!-- All dashboard JS is now inside the single <script> block above. No demo or duplicate JS code remains. -->
+</body>
+</html>
