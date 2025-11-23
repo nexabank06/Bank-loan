@@ -6,20 +6,12 @@ let transporter = null;
 function initializeMailer() {
   if (transporter) return transporter;
 
-  // Use Gmail SMTP (free)
-  // Set these env vars:
-  // MAIL_HOST=smtp.gmail.com
-  // MAIL_PORT=587
-  // MAIL_USER=your-gmail@gmail.com
-  // MAIL_PASS=your-app-password (generate from Google Account)
-  // MAIL_FROM=noreply@nexabank.com
-
   transporter = nodemailer.createTransport({
-    host: process.env.MAIL_HOST || 'smtp.gmail.com',
+    host: process.env.MAIL_HOST || 'smtp.sendgrid.net',
     port: parseInt(process.env.MAIL_PORT || '587'),
     secure: process.env.MAIL_PORT === '465',
     auth: {
-      user: process.env.MAIL_USER,
+      user: process.env.MAIL_USER || 'apikey',
       pass: process.env.MAIL_PASS,
     },
   });
