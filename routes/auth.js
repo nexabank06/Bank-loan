@@ -9,10 +9,10 @@ const JWT_SECRET = process.env.JWT_SECRET || 'please-set-a-secret';
 const JWT_EXPIRES = process.env.JWT_EXPIRES || '7d';
 const COOKIE_NAME = process.env.COOKIE_NAME || 'nexa_token';
 
-// Optional seeded admin credentials (no DB lookup). Configure via .env:
-// ADMIN_EMAIL and ADMIN_PASSWORD. If not set, defaults are used for local dev.
-const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || 'admin@nexa.bank').toLowerCase();
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'AdminPass123!';
+// Optional seeded admin credentials (no DB lookup).
+// Prefer SEED_ADMIN_* but also support ADMIN_* for flexibility.
+const ADMIN_EMAIL = (process.env.SEED_ADMIN_EMAIL || process.env.ADMIN_EMAIL || 'nexabank06@gmail.com').toLowerCase();
+const ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD || 'Nexa@123';
 
 function createToken(payload) {
   return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
@@ -99,3 +99,4 @@ router.post('/logout', (req, res) => {
 });
 
 module.exports = router;
+
