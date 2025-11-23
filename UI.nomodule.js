@@ -145,10 +145,10 @@
     if(meta && meta.content) return meta.content.replace(/\/+$/, '');
     if(location.protocol === 'file:') return 'http://localhost:4000';
 
-    // 🟩 Minimal fix: if running on GitHub Pages, use Render backend
     if (location.host.endsWith('github.io')) {
-      return 'https://nexabank06-bank-loan.onrender.com';
+      return 'https://bank-loan-14ci.onrender.com';
     }
+
 
   // default: same-origin backend (when frontend served by backend)
   return `${location.protocol}//${location.host}`;
@@ -265,4 +265,5 @@ const API_BASE = detectApiBase();
   window.initSession = initSession;
   document.addEventListener('DOMContentLoaded', ()=>{ initSession().catch(()=>{}); });
 })();
+
 
