@@ -10,7 +10,7 @@ const rateLimit = require('express-rate-limit');
 
 const path = require('path');
 const authRoutes = require('./routes/auth');
-const { requireAuth } = require('./middleware/auth');
+const { requireAuth } = require('./middleware/authMiddleware');
 const emailVerifyRoutes = require('./routes/email-verify');
 const loansRoutes = require('./routes/loans');
 const usersRoutes = require('./routes/users');
@@ -132,6 +132,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
