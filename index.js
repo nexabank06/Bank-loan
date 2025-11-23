@@ -44,14 +44,36 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-// VERY SIMPLE CORS: allow any origin (good enough for your college project)
-const corsOptions = {
-  origin: true,        // reflects the request Origin header
-  credentials: true,   // allow cookies/authorization headers
-};
+// SIMPLE & CORRECT CORS for GitHub Pages + Render
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+  const allowedOrigins = [
+    'https://nexabank06.github.io',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000'
+  ];
+
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization'
+    );
+    res.header(
+      'Access-Control-Allow-Methods',
+      'GET,POST,PUT,PATCH,DELETE,OPTIONS'
+    );
+  }
+
+  // Handle preflight requests immediately
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 const limiter = rateLimit({ windowMs: 60 * 1000, max: 200 });
 app.use(limiter);
@@ -110,6 +132,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
