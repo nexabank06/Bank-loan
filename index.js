@@ -22,7 +22,7 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // FRONTEND_URL may be a single origin or a comma-separated list of allowed origins
-const FRONTEND = process.env.FRONTEND || 'http://localhost:8000';
+const FRONTEND = process.env.FRONTEND || 'http://localhost:8000,https://nexabank06.github.io,https://nexabank06.github.io/Bank-loan/';
 const ALLOW_NULL_ORIGIN = (process.env.ALLOW_NULL_ORIGIN === 'true') || (process.env.NODE_ENV !== 'production');
 
 // Safety checks in production
@@ -57,9 +57,6 @@ const corsOptions = {
     }
 
     const allowed = FRONTEND.split(',').map(s => s.trim()).filter(Boolean);
-    // Helpful defaults used during development
-    allowed.push('https://aayu061.github.io');
-    allowed.push('https://aayu061.github.io/Bank-loan');
 
     if (allowed.includes(origin)) return cb(null, true);
     // Deny but do not create an exception (avoid 500 on OPTIONS). Browser will block the request.
@@ -129,6 +126,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
