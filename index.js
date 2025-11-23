@@ -76,7 +76,7 @@ const limiter = rateLimit({ windowMs: 60 * 1000, max: 200 });
 app.use(limiter);
 
 // Trust proxy for secure cookies behind proxies like Render
-app.set('trust proxy', true);
+app.set('trust proxy', 1);
 
 // Serve frontend static files (optional)
 const frontendDir = path.join(__dirname, '..', 'Frontend');
@@ -129,5 +129,6 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
