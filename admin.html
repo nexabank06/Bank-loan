@@ -187,6 +187,15 @@
       fetchAdminActivityFeed();
       fetchAdminCustomers();
     });
+    // Logout button handler
+    document.getElementById('adminLogout').onclick = async function() {
+      try {
+        await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
+        window.location.href = 'admin-login.html';
+      } catch (e) {
+        alert('Logout failed');
+      }
+    };
   </script>
 </body>
 </html>
