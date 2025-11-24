@@ -1,27 +1,9 @@
-// Email helper using NodeMailer
 const nodemailer = require('nodemailer');
 
 let transporter = null;
 
 function initializeMailer() {
   if (transporter) return transporter;
-
-
-  // Use SendGrid SMTP (easy for student projects)
-  // Set these env vars:
-  // MAIL_HOST=smtp.sendgrid.net
-  // MAIL_PORT=587
-  // MAIL_USER=apikey
-  // MAIL_PASS=your_sendgrid_api_key
-  // MAIL_FROM=your_verified_sender@example.com
-
-  // Example for Render.com or .env:
-  // MAIL_HOST=smtp.sendgrid.net
-  // MAIL_PORT=587
-  // MAIL_USER=apikey
-  // MAIL_PASS=SG.xxxxxxxx... (your SendGrid API key)
-  // MAIL_FROM=your_verified_sender@example.com
-
 
   transporter = nodemailer.createTransport({
     host: process.env.MAIL_HOST || 'smtp.sendgrid.net',
@@ -76,4 +58,18 @@ async function sendBulkEmail({ recipients, subject, html, text }) {
   return results;
 }
 
-module.exports = { sendEmail, sendBulkEmail };
+async function sendSupportEmail({ name, email, subject, message }) {
+  const supportTo = process.env.MAIL_FROM;
+  const mailSubject = `[Support] ${subject}`;
+  const html = `<div style="font-family:sans-serif;font-size:1.1em;">
+    <b>From:</b> ${name} (${email})<br>
+    <b>Subject:</b> ${subject}<br><br>
+    <b>Message:</b><br>
+    <div style="margin:1em 0;padding:1em;background:#f3f4f6;color:#23263a;border-radius:8px;">${message.replace(/\n/g,'<br>')}</div>
+  </div>`;
+  const text = `From: ${name} (${email})\nSubject: ${subject}\n\n${message}`;
+  return sendEmail({ to: supportTo, subject: mailSubject, html, text });
+}
+
+module.exports = { sendEmail, sendBulkEmail, sendSupportEmail };
+
