@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Contact Support</title>
+  <meta name="api-base" content="https://bank-loan-14ci.onrender.com">
   <link rel="stylesheet" href="style.css">
   <style>
     .container {
@@ -107,40 +108,54 @@
     <div id="responseMsg"></div>
   </div>
   <script>
-    const responseMsg = document.getElementById('responseMsg');
-    document.getElementById('emailForm').onsubmit = async function(e) {
-      e.preventDefault();
-      const form = e.target;
-      const data = {
-        name: form.name.value,
-        email: form.email.value,
-        subject: form.subject.value,
-        message: form.message.value
-      };
-      responseMsg.textContent = 'Sending...';
-      responseMsg.classList.add('visible');
-      try {
-        const res = await fetch('/api/email/support', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-        const result = await res.json();
-        if (res.ok) {
-          responseMsg.textContent = 'Your message has been sent!';
-          responseMsg.style.color = '#2ecc71';
-          form.reset();
-        } else {
-          responseMsg.textContent = result.error || 'Failed to send message.';
-          responseMsg.style.color = '#f76d6d';
-        }
-      } catch (err) {
-        responseMsg.textContent = 'An error occurred.';
+  const API_BASE =
+    document.querySelector('meta[name="api-base"]')?.content ||
+    'http://localhost:4000';
+
+  const responseMsg = document.getElementById('responseMsg');
+
+  document.getElementById('emailForm').onsubmit = async function (e) {
+    e.preventDefault();
+    const form = e.target;
+    const data = {
+      name: form.name.value,
+      email: form.email.value,
+      subject: form.subject.value,
+      message: form.message.value
+    };
+
+    responseMsg.textContent = 'Sending...';
+    responseMsg.classList.add('visible');
+
+    try {
+      const res = await fetch(`${API_BASE}/api/email/support`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        // credentials not required unless you need cookies:
+        // credentials: 'include',
+        body: JSON.stringify(data)
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        responseMsg.textContent = 'Your message has been sent!';
+        responseMsg.style.color = '#2ecc71';
+        form.reset();
+      } else {
+        responseMsg.textContent = result.error || 'Failed to send message.';
         responseMsg.style.color = '#f76d6d';
       }
-      responseMsg.classList.add('visible');
-      setTimeout(() => responseMsg.classList.remove('visible'), 3500);
-    };
-  </script>
+    } catch (err) {
+      console.error(err);
+      responseMsg.textContent = 'An error occurred.';
+      responseMsg.style.color = '#f76d6d';
+    }
+
+    responseMsg.classList.add('visible');
+    setTimeout(() => responseMsg.classList.remove('visible'), 3500);
+  };
+</script>
 </body>
 </html>
+
