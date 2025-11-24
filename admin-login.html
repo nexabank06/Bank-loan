@@ -98,10 +98,17 @@
       if(!btn) return;
       btn.addEventListener('click', async ()=>{
         try{
-          await window.api.login({ email: email.value.trim(), password: pass.value });
-          if(window.showSuccessDialog) showSuccessDialog('Login successful', 'Welcome back', 'admin.html', 1300);
-          else { showToast('Login successful', 1500); setTimeout(()=> location.href='admin.html', 900); }
-        }catch(err){ showToast(err.message || 'Login failed', 2500); }
+          const result = await window.api.login({ email: email.value.trim(), password: pass.value });
+          // Only allow login if result.user && result.user.role === 'admin'
+          if(result && result.user && result.user.role === 'admin') {
+            if(window.showSuccessDialog) showSuccessDialog('Login successful', 'Welcome back', 'admin.html', 1300);
+            else { showToast('Login successful', 1500); setTimeout(()=> location.href='admin.html', 900); }
+          } else {
+            showToast('Only admin credentials are allowed here.', 3000);
+          }
+        }catch(err){
+          showToast('Only admin credentials are allowed here.', 3000);
+        }
       });
     })();
   </script>
