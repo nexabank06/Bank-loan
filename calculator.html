@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en" class="dark">
 <head>
   <title>Nexa Bank — EMI Calculator</title>
@@ -25,7 +25,7 @@
       <nav class="hidden sm:flex items-center gap-6 text-sm" aria-label="Main">
         <a class="nav-link hover:text-brand transition" data-page="products" href="products.html">Loan Products</a>
         <a class="nav-link hover:text-brand transition" data-page="calculator" href="calculator.html">EMI Calculator</a>
-        <a class="nav-link hover:text-brand transition" data-page="faq" href="faq.html">FAQ</a>
+        <a class="nav-link hover:text-brand transition" data-page="credit score" href="credit-score.html">Credit Score</a>
         <a class="px-4 py-2 rounded-full bg-brand hover:bg-brand-dark font-semibold transition" href="admin-login.html">Office Login</a>
       </nav>
       <button id="mobileMenuBtn" class="sm:hidden text-2xl" aria-label="Open menu">☰</button>
@@ -34,7 +34,7 @@
       <div class="container-max mx-auto px-4 py-3 grid gap-2 text-sm">
         <a class="nav-link hover:text-brand transition block py-2" data-page="products" href="products.html">Loan Products</a>
         <a class="nav-link hover:text-brand transition block py-2" data-page="calculator" href="calculator.html">EMI Calculator</a>
-        <a class="nav-link hover:text-brand transition block py-2" data-page="faq" href="faq.html">FAQ</a>
+        <a class="nav-link hover:text-brand transition block py-2" data-page="Credit Score" href="credit-score.html">Credit Score</a>
         <a class="px-3 py-2.5 rounded-lg bg-brand hover:bg-brand-dark font-semibold text-center transition" href="admin-login.html">Office Login</a>
       </div>
     </nav>
@@ -62,7 +62,7 @@
           <label class="block group">
             <span class="text-xs md:text-sm font-semibold text-slate-200 mb-2 block group-hover:text-brand transition">💰 Loan Amount (₹)</span>
             <div class="relative">
-              <input id="amt" type="number" placeholder="500,000"
+              <input id="amt" type="text" placeholder="" value="" 
                      class="w-full rounded-lg md:rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/10 group-hover:border-brand/50 px-3 md:px-4 py-2.5 md:py-3.5 focus:ring-2 focus:ring-brand outline-none transition text-base md:text-lg" />
               <span class="absolute right-3 md:right-4 top-2.5 md:top-3.5 text-slate-500">₹</span>
             </div>
@@ -72,7 +72,7 @@
           <label class="block group">
             <span class="text-xs md:text-sm font-semibold text-slate-200 mb-2 block group-hover:text-brand transition">📊 Interest Rate (% p.a.)</span>
             <div class="relative">
-              <input id="rate" type="number" step="0.01" placeholder="10.5"
+              <input id="rate" type="text" placeholder="" value="" 
                      class="w-full rounded-lg md:rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/10 group-hover:border-brand/50 px-3 md:px-4 py-2.5 md:py-3.5 focus:ring-2 focus:ring-brand outline-none transition text-base md:text-lg" />
               <span class="absolute right-3 md:right-4 top-2.5 md:top-3.5 text-slate-500">%</span>
             </div>
@@ -82,7 +82,7 @@
           <label class="block group">
             <span class="text-xs md:text-sm font-semibold text-slate-200 mb-2 block group-hover:text-brand transition">⏱️ Tenure (Months)</span>
             <div class="relative">
-              <input id="months" type="number" placeholder="36"
+              <input id="months" type="text" placeholder="" value="" 
                      class="w-full rounded-lg md:rounded-xl bg-gradient-to-br from-slate-800 to-slate-900 border-2 border-white/10 group-hover:border-brand/50 px-3 md:px-4 py-2.5 md:py-3.5 focus:ring-2 focus:ring-brand outline-none transition text-base md:text-lg" />
               <span class="absolute right-3 md:right-4 top-2.5 md:top-3.5 text-slate-500">m</span>
             </div>
@@ -118,6 +118,7 @@
           </a>
 
           <p class="text-xs text-slate-500 text-center">💡 <span class="font-semibold">Tip:</span> Change values to see EMI update in real-time</p>
+                  <p class="text-xs text-slate-500 text-center mt-2">Disclaimer: Please note that these calculators are for illustrations only and do not represent actual returns.<br>Stock Market does not have a fixed rate of return and it is not possible to predict the rate of return.</p>
         </div>
       </section>
     </div>
