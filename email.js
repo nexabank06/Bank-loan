@@ -59,4 +59,19 @@ async function sendBulkEmail({ recipients, subject, html, text }) {
   return results;
 }
 
-module.exports = { sendEmail, sendBulkEmail };
+
+// Send support email from contact form
+async function sendSupportEmail({ name, email, subject, message }) {
+  const supportTo = process.env.MAIL_FROM;
+  const mailSubject = `[Support] ${subject}`;
+  const html = `<div style="font-family:sans-serif;font-size:1.1em;">
+    <b>From:</b> ${name} (${email})<br>
+    <b>Subject:</b> ${subject}<br><br>
+    <b>Message:</b><br>
+    <div style="margin:1em 0;padding:1em;background:#f3f4f6;color:#23263a;border-radius:8px;">${message.replace(/\n/g,'<br>')}</div>
+  </div>`;
+  const text = `From: ${name} (${email})\nSubject: ${subject}\n\n${message}`;
+  return sendEmail({ to: supportTo, subject: mailSubject, html, text });
+}
+
+module.exports = { sendEmail, sendBulkEmail, sendSupportEmail };
