@@ -57,13 +57,17 @@ router.post('/login', async (req, res, next) => {
     const { email, password, totp_token } = req.body || {};
     if (!email || !password) return res.status(400).json({ ok: false, error: 'Missing fields' });
 
-    // Shortcut: if credentials match the seeded admin (configured via env),
-    // skip DB lookup and issue an admin token.
+    // Only allow admin login for the credentials in environment variables.
     if (email.toLowerCase() === ADMIN_EMAIL) {
-      if (password !== ADMIN_PASSWORD) return res.status(401).json({ ok: false, error: 'Invalid credentials' });
-      const token = createToken({ role: 'admin', admin: true, email: ADMIN_EMAIL });
-      res.cookie(COOKIE_NAME, token, cookieOptions());
-      return res.json({ ok: true, user: { id: 'admin', email: ADMIN_EMAIL, first_name: 'Admin', role: 'admin' } });
+      if (password === ADMIN_PASSWORD) {
+        // Only allow login if credentials match exactly
+        const token = createToken({ role: 'admin', admin: true, email: ADMIN_EMAIL });
+        res.cookie(COOKIE_NAME, token, cookieOptions());
+        return res.json({ ok: true, user: { id: 'admin', email: ADMIN_EMAIL, first_name: 'Admin', role: 'admin' } });
+      } else {
+        // Do not check the database for admin email, always reject if password does not match
+        return res.status(401).json({ ok: false, error: 'Invalid credentials' });
+      }
     }
 
     const result = await db.query('SELECT id, password_hash, first_name, last_name, email, role, phone, totp_enabled FROM users WHERE email = $1', [email.toLowerCase()]);
@@ -99,4 +103,3 @@ router.post('/logout', (req, res) => {
 });
 
 module.exports = router;
-
