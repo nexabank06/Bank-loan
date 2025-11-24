@@ -89,6 +89,7 @@ app.use(express.static(frontendDir));
 app.use('/api/auth', authRoutes);
 app.use('/api', authRoutes);
 app.use('/api/email', emailVerifyRoutes);
+try { const emailSupportRoutes = require('./routes/email'); app.use('/api/email', emailSupportRoutes); } catch (e) {}
 app.use('/api/loans', loansRoutes);
 // Also expose loans routes at /api for compatibility with frontend calls to /api/applications
 app.use('/api', loansRoutes);
@@ -132,6 +133,7 @@ if (require.main === module) {
 }
 
 module.exports = app;
+
 
 
 
