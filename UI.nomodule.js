@@ -121,7 +121,7 @@
       if(input) { input.addEventListener('input', calc); input.addEventListener('change', calc); input.addEventListener('keyup', calc); }
     });
 
-    A.value = '500000'; R.value = '10.5'; M.value = '36'; calc();
+    A.value = ''; R.value = ''; M.value = ''; calc();
   }
 
   // Expose functions to the global scope for non-module use
@@ -265,5 +265,6 @@ const API_BASE = detectApiBase();
   window.initSession = initSession;
   document.addEventListener('DOMContentLoaded', ()=>{ initSession().catch(()=>{}); });
 })();
+
 
 
